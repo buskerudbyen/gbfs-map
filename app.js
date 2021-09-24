@@ -13,6 +13,7 @@ const baseLayers = {
 };
 
 //L.control.layers(baseLayers).addTo(map);
+
 const drawNetwork = (network) => {
 
   fetch(`https://api.entur.io/mobility/v2/gbfs/${ network }/station_information`)
@@ -39,8 +40,16 @@ drawNetwork("drammenbysykkel");
 fetch(`https://api.entur.io/mobility/v2/gbfs`)
     .then(response => response.json())
     .then(json => {
-      json.systems.map(s => s.id).forEach(name => {
 
-
+      const options = json.systems.map(s => s.id).map(name => {
+        const option = document.createElement("option");
+        option.onclick = (evt) => drawNetwork(name);
+        const text = document.createTextNode(name);
+        option.appendChild(text);
+        return option;
       });
+
+      const select = document.getElementById("systems");
+
+      options.forEach(option => select.appendChild(option));
     });
