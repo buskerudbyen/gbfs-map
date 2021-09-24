@@ -65,13 +65,21 @@ fetch(`https://api.entur.io/mobility/v2/gbfs`)
 
     const options = json.systems.map(s => s.id).map(name => {
       const option = document.createElement("option");
-      option.onclick = (evt) => drawNetwork(name);
+      option.value = name;
+      if(name == system) {
+        option.selected = "selected";
+      }
       const text = document.createTextNode(name);
       option.appendChild(text);
       return option;
     });
 
     const select = document.getElementById("systems");
-
     options.forEach(option => select.appendChild(option));
+
+    select.onchange = (evt) => {
+      const system = evt.target.selectedOptions[0].value
+      drawNetwork(system);
+    }
+
   });
