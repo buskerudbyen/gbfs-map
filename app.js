@@ -49,6 +49,11 @@ const drawNetwork = (network) => {
   markerGroup.clearLayers();
   getData(network, "station_information");
   getData(network, "free_bike_status");
+
+  const url = new URL(window.location);
+  url.searchParams.set('system', network);
+  window.history.pushState({}, '', url);
+
 }
 
 drawNetwork("drammenbysykkel");
