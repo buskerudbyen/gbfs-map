@@ -53,10 +53,11 @@ const drawNetwork = (network) => {
   const url = new URL(window.location);
   url.searchParams.set('system', network);
   window.history.pushState({}, '', url);
-
 }
 
-drawNetwork("drammenbysykkel");
+const queryParams = new URLSearchParams(window.location.search);
+const system = queryParams.get('system') || "drammenbysykkel";
+drawNetwork(system);
 
 fetch(`https://api.entur.io/mobility/v2/gbfs`)
   .then(response => response.json())
