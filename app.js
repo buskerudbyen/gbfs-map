@@ -35,3 +35,12 @@ const drawNetwork = (network) => {
 }
 
 drawNetwork("drammenbysykkel");
+
+fetch(`https://api.entur.io/mobility/v2/gbfs`)
+    .then(response => response.json())
+    .then(json => {
+      json.systems.map(s => s.id).forEach(name => {
+
+
+      });
+    });

@@ -2,7 +2,7 @@
 <html>
   <head>
 
-    <title>Polyline visualiser</title>
+    <title>GBFS Map</title>
 
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -23,18 +23,21 @@ html, body {
       height: 100%;
     }
 
+    select {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 1000;
+    }
+
     </style>
 
 
   </head>
   <body>
-    <select>
-      <option value=””>option1</option>
-      <option value=””>option2</option>
-      <option value=””>option3</option>
-      <option value=””>option3</option>
-    </select>
     <div id='map'>
+      <select>
+      </select>
 
     </div>
 
