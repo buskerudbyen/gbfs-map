@@ -14,42 +14,58 @@ const baseLayers = {
 
 //L.control.layers(baseLayers).addTo(map);
 
+const markerGroup = L.featureGroup();
+
+const getData = (system, endpoint) => {
+  fetch(`https://api.entur.io/mobility/v2/gbfs/${ system }/${endpoint}`)
+    .then(response => {
+      if(response.ok) {
+        return response.json();
+      } else {
+        return { data: { bikes: [], stations: [] }};
+      }
+    })
+  .then(json => {
+
+    const data = json.data.stations || json.data.bikes || [];
+
+    data.forEach(station => {
+      const marker = L.marker([station.lat, station.lon])
+        .bindPopup(station.name || "Free-floating bike")
+        .addTo(map);
+      markerGroup.addLayer(marker);
+
+    })
+
+    map.fitBounds(markerGroup.getBounds());
+
+  });
+};
+
 const drawNetwork = (network) => {
-
-  fetch(`https://api.entur.io/mobility/v2/gbfs/${ network }/station_information`)
-    .then(response => response.json())
-    .then(json => {
-      const markerGroup = L.featureGroup();
-
-      json.data.stations.forEach(station => {
-        console.log(station);
-        const marker = L.marker([station.lat, station.lon])
-          .bindPopup(station.name)
-          .addTo(map);
-        markerGroup.addLayer(marker);
-
-      })
-
-      map.fitBounds(markerGroup.getBounds());
-
-    });
+  markerGroup.eachLayer((layer) => {
+    layer.remove();
+  });
+  markerGroup.clearLayers();
+  getData(network, "station_information");
+  getData(network, "free_bike_status");
 }
 
 drawNetwork("drammenbysykkel");
 
 fetch(`https://api.entur.io/mobility/v2/gbfs`)
-    .then(response => response.json())
-    .then(json => {
+  .then(response => response.json())
+  .then(json => {
 
-      const options = json.systems.map(s => s.id).map(name => {
-        const option = document.createElement("option");
-        option.onclick = (evt) => drawNetwork(name);
-        const text = document.createTextNode(name);
-        option.appendChild(text);
-        return option;
-      });
-
-      const select = document.getElementById("systems");
-
-      options.forEach(option => select.appendChild(option));
+    const options = json.systems.map(s => s.id).map(name => {
+      const option = document.createElement("option");
+      option.onclick = (evt) => drawNetwork(name);
+      const text = document.createTextNode(name);
+      option.appendChild(text);
+      return option;
     });
+
+    const select = document.getElementById("systems");
+
+    options.forEach(option => select.appendChild(option));
+  });
