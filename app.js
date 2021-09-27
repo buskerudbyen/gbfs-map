@@ -126,3 +126,44 @@ fetch(`https://api.entur.io/mobility/v2/gbfs`)
     }
 
   });
+
+
+
+const modal = document.querySelector(".modal");
+const closeButton = document.querySelector(".close-button");
+const textArea = document.querySelector("textarea");
+
+function toggleModal() {
+  modal.classList.toggle("show-modal");
+
+  const html = `
+<iframe
+  src="${window.location.href}"
+  style="border:0px #ffffff none;"
+  name="bicycle-rental-map"
+  scrolling="no"
+  frameborder="0"
+  marginheight="0px"
+  marginwidth="0px"
+  height="400px"
+  width="600px"
+  allowfullscreen>
+</iframe>
+`;
+  textArea.value = html.trim();
+
+}
+
+function windowOnClick(event) {
+  if (event.target === modal) {
+    toggleModal();
+  }
+}
+
+closeButton.addEventListener("click", toggleModal);
+window.addEventListener("click", windowOnClick);
+
+
+L.easyButton('<img class="embed" src="embed.svg">', function(btn, map){
+  toggleModal();
+}).addTo(map);
