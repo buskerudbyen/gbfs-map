@@ -26,25 +26,41 @@ const svgIcon = (available) => { return L.divIcon({
 };
 
 
-const getData = (system, endpoint) => {
-  fetch(`https://api.entur.io/mobility/v2/gbfs/${ system }/${endpoint}`)
+const getStationData = (system) => {
+
+  const info = fetch(`https://api.entur.io/mobility/v2/gbfs/${ system }/station_information`)
     .then(response => {
       if(response.ok) {
         return response.json();
       } else {
-        return { data: { bikes: [], stations: [] }};
+        return { data: { stations: [] }};
       }
-    })
-  .then(json => {
+    });
 
-    const data = json.data.stations || json.data.bikes || [];
+  const status = fetch(`https://api.entur.io/mobility/v2/gbfs/${ system }/station_status`)
+    .then(response => {
+      if(response.ok) {
+        return response.json();
+      } else {
+        return { data: { stations: [] }};
+      }
+    });
 
-    data.forEach(station => {
-      const marker = L.marker([station.lat, station.lon], { icon: svgIcon(station.capacity || 1) })
+  Promise.all([info, status]).then(data => {
+
+    const info = data[0];
+    const status = data[1];
+
+    info.data.stations.forEach(station => {
+
+      const stationStatus = status.data.stations.find(s => s.station_id == station.station_id);
+
+      console.log(stationStatus)
+
+      const marker = L.marker([station.lat, station.lon], { icon: svgIcon(stationStatus.num_bikes_available) })
         .bindPopup(station.name || "Free-floating bike")
         .addTo(map);
       markerGroup.addLayer(marker);
-
     })
 
     map.fitBounds(markerGroup.getBounds());
@@ -57,8 +73,7 @@ const drawNetwork = (network) => {
     layer.remove();
   });
   markerGroup.clearLayers();
-  getData(network, "station_information");
-  getData(network, "free_bike_status");
+  getStationData(network);
 
   const url = new URL(window.location);
   url.searchParams.set('system', network);
