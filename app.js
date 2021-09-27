@@ -53,12 +53,12 @@ const getStationData = (system) => {
 
     info.data.stations.forEach(station => {
 
-      const stationStatus = status.data.stations.find(s => s.station_id == station.station_id);
+      const stationStatus = status.data.stations.find(s => s.station_id == station.station_id) || { num_bikes_available: 0};
 
-      console.log(stationStatus)
+      const available = stationStatus.num_bikes_available;
 
-      const marker = L.marker([station.lat, station.lon], { icon: svgIcon(stationStatus.num_bikes_available) })
-        .bindPopup(station.name || "Free-floating bike")
+      const marker = L.marker([station.lat, station.lon], { icon: svgIcon(available) })
+        .bindPopup(`<strong>${station.name}</strong> <br> ${available} bicycles available`|| "Free-floating bike")
         .addTo(map);
       markerGroup.addLayer(marker);
     })
