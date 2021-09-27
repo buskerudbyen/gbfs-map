@@ -16,13 +16,14 @@ const baseLayers = {
 
 const markerGroup = L.featureGroup();
 
-const svgIcon = L.divIcon({
-  html: "<img class='bicycle'src='bicycle.svg'>",
-  className: "marker",
-  iconAnchor: [12,12],
-  iconSize: [20, 21],
-  popupAnchor: [0, 0]
-});
+const svgIcon = (available) => { return L.divIcon({
+    html: `<img class='bicycle'src='bicycle.svg'><div class='badge'>${available}</div>`,
+    className: "marker",
+    iconAnchor: [12,12],
+    iconSize: [20, 21],
+    popupAnchor: [0, 0]
+  });
+};
 
 
 const getData = (system, endpoint) => {
@@ -39,7 +40,7 @@ const getData = (system, endpoint) => {
     const data = json.data.stations || json.data.bikes || [];
 
     data.forEach(station => {
-      const marker = L.marker([station.lat, station.lon], { icon: svgIcon })
+      const marker = L.marker([station.lat, station.lon], { icon: svgIcon(station.capacity || 1) })
         .bindPopup(station.name || "Free-floating bike")
         .addTo(map);
       markerGroup.addLayer(marker);
