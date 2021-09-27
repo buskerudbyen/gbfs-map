@@ -46,7 +46,16 @@ const getStationData = (system) => {
       }
     });
 
-  Promise.all([info, status]).then(data => {
+  const bikes = fetch(`https://api.entur.io/mobility/v2/gbfs/${ system }/free_bike_status`)
+    .then(response => {
+      if(response.ok) {
+        return response.json();
+      } else {
+        return { data: { bikes: [] }};
+      }
+    });
+
+  Promise.all([info, status, bikes]).then(data => {
 
     const info = data[0];
     const status = data[1];
@@ -61,7 +70,15 @@ const getStationData = (system) => {
         .bindPopup(`<strong>${station.name}</strong> <br> ${available} bicycles available`|| "Free-floating bike")
         .addTo(map);
       markerGroup.addLayer(marker);
-    })
+    });
+
+    const bikes = data[2];
+
+    bikes.data.bikes.forEach(station => {
+      const marker = L.marker([station.lat, station.lon], { icon: svgIcon(1) })
+        .addTo(map);
+      markerGroup.addLayer(marker);
+    });
 
     map.fitBounds(markerGroup.getBounds());
 
