@@ -16,6 +16,15 @@ const baseLayers = {
 
 const markerGroup = L.featureGroup();
 
+const svgIcon = L.divIcon({
+  html: "<img class='bicycle'src='bicycle.svg'>",
+  className: "marker",
+  iconAnchor: [12,12],
+  iconSize: [20, 21],
+  popupAnchor: [0, 0]
+});
+
+
 const getData = (system, endpoint) => {
   fetch(`https://api.entur.io/mobility/v2/gbfs/${ system }/${endpoint}`)
     .then(response => {
@@ -30,7 +39,7 @@ const getData = (system, endpoint) => {
     const data = json.data.stations || json.data.bikes || [];
 
     data.forEach(station => {
-      const marker = L.marker([station.lat, station.lon])
+      const marker = L.marker([station.lat, station.lon], { icon: svgIcon })
         .bindPopup(station.name || "Free-floating bike")
         .addTo(map);
       markerGroup.addLayer(marker);
@@ -54,6 +63,7 @@ const drawNetwork = (network) => {
   url.searchParams.set('system', network);
   window.history.pushState({}, '', url);
 }
+
 
 const queryParams = new URLSearchParams(window.location.search);
 const system = queryParams.get('system') || "drammenbysykkel";
